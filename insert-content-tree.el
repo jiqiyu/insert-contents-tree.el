@@ -46,7 +46,7 @@
 ;; └─3
 ;;    └─3.1
 
-;; after require the func, you can check out following examples, use C-x C-e on them
+;; after require the func, you can check out following examples
 
 ;; few examples of acceptable aurgument:
 
