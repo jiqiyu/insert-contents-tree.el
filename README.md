@@ -1,4 +1,4 @@
-insert-content-tree.el
+insert-contents-tree.el
 ======================
 
 Generate a contents tree according to given string.
