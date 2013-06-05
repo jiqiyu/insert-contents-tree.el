@@ -64,9 +64,9 @@ After require the func, you can check out following examples,
 (insert-contents-tree "tree/a/d/e/f,")
 
 ;; if braces do not match
-;; signal an error: Wrong format of argument, braces do not match, unclosed {s.
+;; signal an error: Wrong format of argument, braces do not match, unclosed {s
 (insert-contents-tree "tree/{a/d/e/f,b/{g,c}")
-;; signal an error: Wrong format of argument, unmatched braces, maybe too many }s.
+;; signal an error: Wrong format of argument, unmatched braces, maybe too many }s
 (insert-contents-tree "tree/{a/d/e/f,b/g,c}}")
 
 ;; other
