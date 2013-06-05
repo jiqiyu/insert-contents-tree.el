@@ -33,20 +33,20 @@
 ;; would insert following contents tree into current buffer(at the cursor point):
 
 ;; CONTENTS TITLE/
-;; ├─1
-;; │  └─1.1
-;; │      ├─1.1.1
-;; │      │  ├─1.1.1.1
-;; │      │  ├─1.1.1.2
-;; │      │  └─1.1.1.3
-;; │      ├─1.1.2
-;; │      └─1.1.3
-;; ├─2
-;; │  └─2.1
-;; └─3
-;;    └─3.1
+;; |-- 1
+;; |   `-- 1.1
+;; |       |-- 1.1.1
+;; |       |   |-- 1.1.1.1
+;; |       |   |-- 1.1.1.2
+;; |       |   `-- 1.1.1.3
+;; |       |-- 1.1.2
+;; |       `-- 1.1.3
+;; |-- 2
+;; |   `-- 2.1
+;; `-- 3
+;;     `-- 3.1
 
-;; After require the func, you can check out following examples
+;; After require the func, you can check out following examples,
 
 ;; A few examples of acceptable aurgument:
 
@@ -92,18 +92,19 @@ would insert following contents tree into current buffer (starts from
 a new line after the cursor point):
 
 CONTENTS TITLE/
-├─1
-│  └─1.1
-│      ├─1.1.1
-│      │  ├─1.1.1.1
-│      │  ├─1.1.1.2
-│      │  └─1.1.1.3
-│      ├─1.1.2
-│      └─1.1.3
-├─2
-│  └─2.1
-└─3
-   └─3.1
+|-- 1
+|   `-- 1.1
+|       |-- 1.1.1
+|       |   |-- 1.1.1.1
+|       |   |-- 1.1.1.2
+|       |   `-- 1.1.1.3
+|       |-- 1.1.2
+|       `-- 1.1.3
+|-- 2
+|   `-- 2.1
+`-- 3
+    `-- 3.1
+
 "
   (interactive "sType a string to generate your tree: ")
   (let ((contents_tree "\n\n")
@@ -126,12 +127,13 @@ CONTENTS TITLE/
         (comma_tmp_str "")
         (comma_ttmp_str "")
         (sib_flag_list nil)
-        (JOINT '("├─" "└─")) ;or (JOINT '("|-- " "`-- "))
-        (VBSP "│  ") ;or (VBSP "|   ") ;vertical bar and spaces
+        (JOINT '("|-- " "`-- ")) ;or (JOINT '("├─" "└─"))
+        (VBSP "|   ") ;or (VBSP "│  ") ;vertical bar and 2 spaces
         (4SPACES "    "))
     (if (string-match "\\(^.+?\\)/" str)
         (progn
-          (setq contents_tree (concat contents_tree (match-string 0 str) "\n")) ;CONTENTS TITLE
+          ;CONTENTS TITLE
+          (setq contents_tree (concat contents_tree (match-string 0 str) "\n"))
           (setq str (replace-match "/" nil nil str))
           (setq length_of_str (length str)))
       (error "Can't match the title"))
@@ -140,14 +142,17 @@ CONTENTS TITLE/
             (string-match "[,/{]$" str))
         (error "Wrong format of argument"))
     (while (< n length_of_str)
-      (when (< braces 0) (error "Wrong format of argument, unpaired braces, maybe too many }s"))
+      (when (< braces 0)
+        (error "Wrong format of argument, unpaired braces, maybe too many }s"))
       (when (and (>= braces 0)
                (string= "{" (char-to-string (elt str n))))
           (setq braces (1+ braces)))
       (when (string= "}" (char-to-string (elt str n))) (setq braces (1- braces)))
       (setq n (1+ n)))
-    (when (> braces 0) (error "Wrong format of argument, braces do not match, unclosed {s"))
-    (when (< braces 0) (error "Wrong format of argument, unpaired braces, maybe too many }s"))
+    (when (> braces 0)
+      (error "Wrong format of argument, braces do not match, unclosed {s"))
+    (when (< braces 0)
+      (error "Wrong format of argument, unpaired braces, maybe too many }s"))
     (setq n 0)
     (while (< n length_of_str)
       (setq ch (char-to-string (elt str n)))
