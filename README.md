@@ -33,6 +33,27 @@ CONTENTS TITLE/
 
 ```  
 
+If you change ```(JOINT '("├─" "└─"))``` to ```(JOINT '("|-- " "`-- "))``` and ```(VBSP "│  ")``` to ```(VBSP "|   ")```
+in the .el file, the results would like this:
+
+```
+
+CONTENTS TITLE/
+|-- 1
+|   `-- 1.1
+|       |-- 1.1.1
+|       |   |-- 1.1.1.1
+|       |   |-- 1.1.1.2
+|       |   `-- 1.1.1.3
+|       |-- 1.1.2
+|       `-- 1.1.3
+|-- 2
+|   `-- 2.1
+`-- 3
+    `-- 3.1
+
+```
+
 Examples
 ---------------------
 
