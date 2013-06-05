@@ -34,7 +34,7 @@ CONTENTS TITLE/
 ```  
 
 If you change ```(JOINT '("├─" "└─"))``` to ```(JOINT '("|-- " "`-- "))``` and ```(VBSP "│  ")``` to ```(VBSP "|   ")```
-in the .el file, the results would like this:
+in the .el file, the results would look like this:
 
 ```
 
