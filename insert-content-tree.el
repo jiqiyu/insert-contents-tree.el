@@ -82,7 +82,7 @@
 ;; (insert-contents-tree "tree/{a,b,c},d")
 
 ;;; Code:
-(defun insert-contents-tree (str)
+(defun insert-linux-tree (str)
   "For the sake of convenience, this func would expect an
 argument in the same format as in the `mkdir -p' command.
 For example M-x insert-contents-tree <RET> and then enter
@@ -126,8 +126,8 @@ CONTENTS TITLE/
         (comma_tmp_str "")
         (comma_ttmp_str "")
         (sib_flag_list nil)
-        (JOINT '("├─" "└─"))
-        (VB2S "│  ") ;vertical bar and 2 spaces
+        (JOINT '("├─" "└─")) ;or (JOINT '("|-- " "`-- "))
+        (VB2S "│  ") ;or (VB2S "|   ") ;vertical bar and 2 spaces
         (4SPACES "    "))
     (if (string-match "\\(^.+?\\)/" str)
         (progn
@@ -135,194 +135,198 @@ CONTENTS TITLE/
           (setq str (replace-match "/" nil nil str))
           (setq length_of_str (length str)))
       (error "Can't match the title"))
-    (if (or (string-match "\\(/\\{2,\\}\\|{\\{2,\\}\\|,\\{2,\\}\\)" str)
+    (when (or (string-match "\\(/\\{2,\\}\\|{\\{2,\\}\\|,\\{2,\\}\\)" str)
             (string-match "\\({/\\|{}\\|{,\\|,/\\|,}\\|,{\\|/,\\|/}\\|}/\\|}{\\)" str)
             (string-match "[,/{]$" str))
         (error "Wrong format of argument"))
     (while (< n length_of_str)
-      (if (< braces 0) (error "Wrong format of argument, unpaired braces, maybe too many }s"))
-      (if (and (>= braces 0)
+      (when (< braces 0) (error "Wrong format of argument, unpaired braces, maybe too many }s"))
+      (when (and (>= braces 0)
                (string= "{" (char-to-string (elt str n))))
           (setq braces (1+ braces)))
-      (if (string= "}" (char-to-string (elt str n))) (setq braces (1- braces)))
+      (when (string= "}" (char-to-string (elt str n))) (setq braces (1- braces)))
       (setq n (1+ n)))
-    (if (> braces 0) (error "Wrong format of argument, braces do not match, unclosed {s"))
-    (if (< braces 0) (error "Wrong format of argument, unpaired braces, maybe too many }s"))
+    (when (> braces 0) (error "Wrong format of argument, braces do not match, unclosed {s"))
+    (when (< braces 0) (error "Wrong format of argument, unpaired braces, maybe too many }s"))
     (setq n 0)
     (while (< n length_of_str)
       (setq ch (char-to-string (elt str n)))
-      (if (string= ch "/")
-          (progn 
-            (setq level (1+ level))
-            (setq slash_n (1+ n))
-            (while (not (or (>= slash_n length_of_str)
-                            (string= "/" (char-to-string (elt str slash_n)))
-                            (string= "{" (char-to-string (elt str slash_n)))
-                            (string= "}" (char-to-string (elt str slash_n)))
-                            (string= "," (char-to-string (elt str slash_n)))))
-              (setq slash_tmp_str (concat slash_tmp_str (char-to-string (elt str slash_n))))
-              (setq slash_n (1+ slash_n)))
-            (if (string< "" slash_tmp_str)
-                (progn ;write to contents_tree
-                  (if (= slash_n length_of_str) ;end of str
-                      (setq slash_tmp_str (concat (nth 1 JOINT) slash_tmp_str))
-                    (progn
-                      (if (or (string= "," (char-to-string (elt str slash_n)))
-                              (string= "}" (char-to-string (elt str slash_n))))
-                          (progn
-                            (setq slash_tmp_str (concat (nth 1 JOINT) slash_tmp_str))
-                            (setq slash_tmp_flag "do_nothing"))
-                        (if (string= "/" (char-to-string (elt str slash_n)))
-                            (progn
-                              (setq slash_tmp_str (concat (nth 1 JOINT) slash_tmp_str))
-                              (setq slash_tmp_flag nil))))))                  
-                  (if (= level 0)
-                      (setq contents_tree (concat contents_tree slash_tmp_str "\n"))
-                    (progn ;level>0
-                      (dolist (flag (last sib_flag_list level))
-                        (if flag
-                            (setq slash_tmp_str (concat VB2S slash_tmp_str))
-                          (setq slash_tmp_str (concat 4SPACES slash_tmp_str))))
-                      (setq contents_tree (concat contents_tree slash_tmp_str "\n"))))
-                  (if (not (string= "do_nothing" slash_tmp_flag)) (push slash_tmp_flag sib_flag_list))
-                  ))
-            (setq n slash_n) ;increases n
-            (setq slash_tmp_str "") ;reset slash_tmp_str
-            ))
-      (if (string= ch "{")
-          (progn
-            (setq lbrace_n (1+ n))
-            (while (not (or (string= "/" (char-to-string (elt str lbrace_n)))
-                            (string= "{" (char-to-string (elt str lbrace_n)))
-                            (string= "}" (char-to-string (elt str lbrace_n)))
-                            (string= "," (char-to-string (elt str lbrace_n)))))
-              (setq lbrace_tmp_str (concat lbrace_tmp_str (char-to-string (elt str lbrace_n))))
-              (setq lbrace_n (1+ lbrace_n)))
-            (if (string< "" lbrace_tmp_str)
+      (when (string= ch "/") 
+        (setq level (1+ level))
+        (setq slash_n (1+ n))
+        (while (not (or (>= slash_n length_of_str)
+                        (string= "/" (char-to-string (elt str slash_n)))
+                        (string= "{" (char-to-string (elt str slash_n)))
+                        (string= "}" (char-to-string (elt str slash_n)))
+                        (string= "," (char-to-string (elt str slash_n)))))
+          (setq slash_tmp_str (concat slash_tmp_str (char-to-string (elt str slash_n))))
+          (setq slash_n (1+ slash_n)))
+        (when (string< "" slash_tmp_str) ;write to contents_tree
+          (if (= slash_n length_of_str) ;end of str
+              (setq slash_tmp_str (concat (nth 1 JOINT) slash_tmp_str))
+            (progn
+              (if (or (string= "," (char-to-string (elt str slash_n)))
+                      (string= "}" (char-to-string (elt str slash_n))))
+                  (progn
+                    (setq slash_tmp_str (concat (nth 1 JOINT) slash_tmp_str))
+                    (setq slash_tmp_flag "do_nothing"))
+                (when (string= "/" (char-to-string (elt str slash_n)))
+                  (setq slash_tmp_str (concat (nth 1 JOINT) slash_tmp_str))
+                  (setq slash_tmp_flag nil)))))                  
+          (if (= level 0)
+              (setq contents_tree (concat contents_tree slash_tmp_str "\n"))
+            (progn ;level>0
+              (dolist (flag (last sib_flag_list level))
+                (if flag
+                    (setq slash_tmp_str (concat VB2S slash_tmp_str))
+                  (setq slash_tmp_str (concat 4SPACES slash_tmp_str))))
+              (setq contents_tree (concat contents_tree slash_tmp_str "\n"))))
+          (or (string= "do_nothing" slash_tmp_flag)
+              (push slash_tmp_flag sib_flag_list)))
+        (setq n slash_n) ;increases n
+        (setq slash_tmp_str "") ;reset slash_tmp_str
+        )
+      (when (string= ch "{")
+        (setq lbrace_n (1+ n))
+        (while (not (or (string= "/" (char-to-string (elt str lbrace_n)))
+                        (string= "{" (char-to-string (elt str lbrace_n)))
+                        (string= "}" (char-to-string (elt str lbrace_n)))
+                        (string= "," (char-to-string (elt str lbrace_n)))))
+          (setq lbrace_tmp_str (concat lbrace_tmp_str (char-to-string (elt str lbrace_n))))
+          (setq lbrace_n (1+ lbrace_n)))
+        (if (string< "" lbrace_tmp_str)
+            (progn
+              (setq lbrace_tmp_list (list lbrace_tmp_str level))
+              (push lbrace_tmp_list first_siblings_lbrace_list)
+              (setq lbrace_tmp_str (concat (nth 0 JOINT) lbrace_tmp_str))
+              (if (= level 0)
+                  (setq contents_tree (concat contents_tree lbrace_tmp_str "\n"))
                 (progn
-                  (setq lbrace_tmp_list (list lbrace_tmp_str level))
-                  (push lbrace_tmp_list first_siblings_lbrace_list)
-                  (setq lbrace_tmp_str (concat (nth 0 JOINT) lbrace_tmp_str))
-                  (if (= level 0)
-                      (setq contents_tree (concat contents_tree lbrace_tmp_str "\n"))
-                    (progn
-                      (dolist (flag (last sib_flag_list level))
-                        (if flag
-                            (setq lbrace_tmp_str (concat VB2S lbrace_tmp_str))
-                          (setq lbrace_tmp_str (concat 4SPACES lbrace_tmp_str))))
-                      (setq contents_tree (concat contents_tree lbrace_tmp_str "\n"))))
-                  (push t sib_flag_list))
-              (error "Something goes wrong"))
-            (setq n lbrace_n) ;increases n
-            (setq lbrace_tmp_str "") ;reset lbrace_tmp_str
-            ))
-      (if (string= ch "}")
-          (progn
-            (if first_siblings_lbrace_list
-                (setq rbrace_tmp_list (pop first_siblings_lbrace_list))) ;pop
-            (or first_siblings_lbrace_list (setq level -1))
-            (setq rbrace_n (1+ n))
-            (if (and (/= rbrace_n length_of_str)
-                     (< level 0))
-                (error "Wrong format of argument"))
-            (and (< rbrace_n length_of_str)
-                 (or (string= "," (char-to-string (elt str rbrace_n)))
-                     (string= "}" (char-to-string (elt str rbrace_n)))
-                     (error "Wrong format of argument")))
-            (setq n rbrace_n) ;increases n
-            ))
-      (if (string= ch ",")
-          (progn
-            (setq comma_n (1+ n))
-            (while (not (or (>= comma_n length_of_str)
-                            (string= "/" (char-to-string (elt str comma_n)))
-                            (string= "}" (char-to-string (elt str comma_n)))
-                            (string= "{" (char-to-string (elt str comma_n)))
-                            (string= "," (char-to-string (elt str comma_n)))))
-              (setq comma_tmp_str (concat comma_tmp_str (char-to-string (elt str comma_n))))
-              (setq comma_n (1+ comma_n)))
-            (and (= comma_n length_of_str)
-                 (error "Wrong format of argument"))
-            (setq n comma_n) ;increases n
-            (if (string< "" comma_tmp_str)
-                (progn ;find 1st sibling's level and write to contents_tree
-                  (if first_siblings_lbrace_list
-                      (setq level (car (cdr (car first_siblings_lbrace_list)))))
-                  (or level
-                      (error "Something wrong with the variable `level'"))
-                  (if (string= "," (char-to-string (elt str comma_n)))
+                  (dolist (flag (last sib_flag_list level))
+                    (if flag
+                        (setq lbrace_tmp_str (concat VB2S lbrace_tmp_str))
+                      (setq lbrace_tmp_str (concat 4SPACES lbrace_tmp_str))))
+                  (setq contents_tree (concat contents_tree lbrace_tmp_str "\n"))))
+              (push t sib_flag_list))
+          (error "Something goes wrong"))
+        (setq n lbrace_n) ;increases n
+        (setq lbrace_tmp_str "") ;reset lbrace_tmp_str
+        )
+      (when (string= ch "}")
+        (when first_siblings_lbrace_list
+            (setq rbrace_tmp_list (pop first_siblings_lbrace_list))) ;pop
+        (or first_siblings_lbrace_list (setq level -1))
+        (setq rbrace_n (1+ n))
+        (when (and (/= rbrace_n length_of_str)
+                 (< level 0))
+            (error "Wrong format of argument"))
+        (and (< rbrace_n length_of_str)
+             (or (string= "," (char-to-string (elt str rbrace_n)))
+                 (string= "}" (char-to-string (elt str rbrace_n)))
+                 (error "Wrong format of argument")))
+        (setq n rbrace_n) ;increases n
+        )
+      (when (string= ch ",")
+        (setq comma_n (1+ n))
+        (while (not (or (>= comma_n length_of_str)
+                        (string= "/" (char-to-string (elt str comma_n)))
+                        (string= "}" (char-to-string (elt str comma_n)))
+                        (string= "{" (char-to-string (elt str comma_n)))
+                        (string= "," (char-to-string (elt str comma_n)))))
+          (setq comma_tmp_str
+                (concat comma_tmp_str (char-to-string (elt str comma_n))))
+          (setq comma_n (1+ comma_n)))
+        (and (= comma_n length_of_str)
+             (error "Wrong format of argument"))
+        (setq n comma_n) ;increases n
+        (if (string< "" comma_tmp_str)
+            (progn ;find 1st sibling's level and write to contents_tree
+              (when first_siblings_lbrace_list
+                  (setq level (car (cdr (car first_siblings_lbrace_list)))))
+              (or level
+                  (error "Something wrong with the variable `level'"))
+              (if (string= "," (char-to-string (elt str comma_n)))
+                  (progn
+                    (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
+                    (setcar
+                     (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                     t))
+                (progn
+                  (when (string= "}" (char-to-string (elt str comma_n)))
+                    (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
+                    (setcar
+                     (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                     nil))))
+              (when (string= "/" (char-to-string (elt str comma_n)))
+                (while (not (or (>= comma_n length_of_str)
+                                (string= "{" (char-to-string (elt str comma_n)))
+                                (string= "," (char-to-string (elt str comma_n)))
+                                (string= "}" (char-to-string (elt str comma_n)))))
+                  (setq comma_n (1+ comma_n)))
+                (when (< comma_n length_of_str)
+                  (if (string= "{" (char-to-string (elt str comma_n)))
                       (progn
-                        (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
-                        (setcar (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list) t))
-                    (progn
-                      (if (string= "}" (char-to-string (elt str comma_n)))
-                          (progn
-                            (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
-                            (setcar (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list) nil)))))
-                  (if (string= "/" (char-to-string (elt str comma_n)))
-                      (progn
-                        (while (not (or (>= comma_n length_of_str)
-                                        (string= "{" (char-to-string (elt str comma_n)))
-                                        (string= "," (char-to-string (elt str comma_n)))
-                                        (string= "}" (char-to-string (elt str comma_n)))))
-                          (setq comma_n (1+ comma_n)))
-                        (if (< comma_n length_of_str)
+                        (setq comma_slash_lbrace 2)
+                        (while (and (< comma_n length_of_str)
+                                    (not (string= "}" (char-to-string (elt str comma_n)))))
+                          (setq comma_n (1+ comma_n))
+                          (when (string= "{" (char-to-string (elt str comma_n)))
+                              (setq comma_slash_lbrace (1+ comma_slash_lbrace))))
+                        (when (= comma_n length_of_str) ;out of range
+                            (error "Wrong format of argument, braces do not match"))
+                        ;if comma_n points to the last character of string
+                        (when (= (1+ comma_n) length_of_str) 
+                            (error "Wrong format of argument, braces do not match"))
+                        ;if it's at least the third last ch
+                        (if (< (1+ comma_n) (- length_of_str 2))
+                            ;make sure comma_n won't go beyond the second last ch of str
                             (progn
-                              (if (string= "{" (char-to-string (elt str comma_n)))
-                                  (progn
-                                    (setq comma_slash_lbrace 2)
-                                    (while (and (< comma_n length_of_str)
-                                                (not (string= "}" (char-to-string (elt str comma_n)))))
-                                      (setq comma_n (1+ comma_n))
-                                      (if (string= "{" (char-to-string (elt str comma_n)))
-                                          (setq comma_slash_lbrace (1+ comma_slash_lbrace))))
-                                    (if (= comma_n length_of_str) ;out of range
-                                        (error "Wrong format of argument, braces do not match"))
-                                    (if (= (1+ comma_n) length_of_str) ;if comma_n points to the last character of string
-                                        (error "Wrong format of argument, braces do not match"))
-                                    (if (< (1+ comma_n) (- length_of_str 2)) ;if it's at least the third last ch
-                                        (progn ;make sure comma_n won't go beyond the second last ch of str
-                                          (while (and (< comma_n (1- length_of_str))
-                                                      (> comma_slash_lbrace 0)
-                                                      (string= "}" (char-to-string (elt str comma_n))))
-                                            (setq comma_n (1+ comma_n))
-                                            (setq comma_slash_lbrace (1- comma_slash_lbrace))))
-                                      (progn ;comma_n points to the second last ch of str
-                                        (setq comma_slash_lbrace (1- comma_slash_lbrace))
-                                        (setq comma_ttmp_str (char-to-string (elt str (1+ comma_n))))
-                                        (if (not (or (string= "}" comma_ttmp_str)
-                                                     (string= "," comma_ttmp_str)))
-                                            (error "Wrong format of argument"))
-                                        (if (string= "}" comma_ttmp_str)
-                                            (setq comma_slash_lbrace (1- comma_slash_lbrace)))))
-                                    (if (= 0 comma_slash_lbrace) ;no siblings
-                                        (progn
-                                          (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
-                                          (setcar (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list) nil))
-                                      (progn
-                                        (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
-                                        (setcar (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list) t))))
-                                (progn
-                                  (if (string= "," (char-to-string (elt str comma_n)))
-                                      (progn
-                                        (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
-                                        (setcar (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list) t)))
-                                  (if (string= "}" (char-to-string (elt str comma_n)))
-                                      (progn
-                                        (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
-                                        (setcar (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list) nil))))))
-                          )))
-                  (if (or (not level) (= level 0))
-                      (setq contents_tree (concat contents_tree comma_tmp_str "\n"))
+                              (while (and (< comma_n (1- length_of_str))
+                                          (> comma_slash_lbrace 0)
+                                          (string= "}" (char-to-string (elt str comma_n))))
+                                (setq comma_n (1+ comma_n))
+                                (setq comma_slash_lbrace (1- comma_slash_lbrace))))
+                          (progn ;comma_n points to the second last ch of str
+                            (setq comma_slash_lbrace (1- comma_slash_lbrace))
+                            (setq comma_ttmp_str (char-to-string (elt str (1+ comma_n))))
+                            (or (or (string= "}" comma_ttmp_str)
+                                    (string= "," comma_ttmp_str))
+                                (error "Wrong format of argument"))
+                            (when (string= "}" comma_ttmp_str)
+                                (setq comma_slash_lbrace (1- comma_slash_lbrace)))))
+                        (if (= 0 comma_slash_lbrace) ;no siblings
+                            (progn
+                              (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
+                              (setcar
+                               (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                               nil))
+                          (progn
+                            (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
+                            (setcar
+                             (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                             t))))
                     (progn
-                      (dolist (flag (last sib_flag_list level))
-                        (if flag
-                            (setq comma_tmp_str (concat VB2S comma_tmp_str))
-                          (setq comma_tmp_str (concat 4SPACES comma_tmp_str))))
-                      (setq contents_tree (concat contents_tree comma_tmp_str "\n")))))
-              (error "Something goes wrong"))
-            (setq comma_tmp_str "") ;reset comma_tmp_str
-            )))
+                      (when (string= "," (char-to-string (elt str comma_n)))
+                        (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
+                        (setcar
+                         (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                         t))
+                      (when (string= "}" (char-to-string (elt str comma_n)))
+                        (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
+                        (setcar
+                         (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                         nil))))))
+              (if (or (not level) (= level 0))
+                  (setq contents_tree (concat contents_tree comma_tmp_str "\n"))
+                (progn
+                  (dolist (flag (last sib_flag_list level))
+                    (if flag
+                        (setq comma_tmp_str (concat VB2S comma_tmp_str))
+                      (setq comma_tmp_str (concat 4SPACES comma_tmp_str))))
+                  (setq contents_tree (concat contents_tree comma_tmp_str "\n")))))
+          (error "Something goes wrong"))
+        (setq comma_tmp_str "") ;reset comma_tmp_str
+        ))
     (insert contents_tree)))
 
 (provide 'insert-contents-tree)
