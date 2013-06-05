@@ -82,7 +82,7 @@
 ;; (insert-contents-tree "tree/{a,b,c},d")
 
 ;;; Code:
-(defun insert-linux-tree (str)
+(defun insert-contents-tree (str)
   "For the sake of convenience, this func would expect an
 argument in the same format as in the `mkdir -p' command.
 For example M-x insert-contents-tree <RET> and then enter
