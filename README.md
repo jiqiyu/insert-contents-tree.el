@@ -33,11 +33,12 @@ CONTENTS TITLE/
 
 ```  
 
-### Examples
+Examples
+---------------------
 
-after require the func, you can check out following examples,
+After require the func, you can check out following examples,
 
-#### few examples of acceptable aurgument:
+### A few examples of acceptable aurgument:
 
 ```el
 (insert-contents-tree "Tree/{a,b,c}")
@@ -51,7 +52,7 @@ after require the func, you can check out following examples,
 (insert-contents-tree "TITLE/{1/2/{3/{4/{a,b/{c,d/{e,f/{k,o/b/b/b/b/{l,m,n,o/p}}}},r},5,6/{7,8,9,10/11/{12,13}}},14,15},2/2.1,3/3.1}")
 ```
 
-#### few examples of illegal argument:
+### A few examples of illegal argument:
 
 ```el
 ;; if any one of "{/" "{}" "{," ",/" ",}" ",{" "/," "/}" "}/" "}{" "{{" "//" ",," occurs in string
