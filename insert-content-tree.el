@@ -251,12 +251,11 @@ CONTENTS TITLE/
                     (setcar
                      (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
                      t))
-                (progn
-                  (when (string= "}" (char-to-string (elt str comma_n)))
-                    (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
-                    (setcar
-                     (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
-                     nil))))
+                (when (string= "}" (char-to-string (elt str comma_n)))
+                  (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
+                  (setcar
+                   (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                   nil)))
               (when (string= "/" (char-to-string (elt str comma_n)))
                 (while (not (or (>= comma_n length_of_str)
                                 (string= "{" (char-to-string (elt str comma_n)))
@@ -280,12 +279,11 @@ CONTENTS TITLE/
                         ;if it's at least the third last ch
                         (if (< (1+ comma_n) (- length_of_str 2))
                             ;make sure comma_n won't go beyond the second last ch of str
-                            (progn
-                              (while (and (< comma_n (1- length_of_str))
-                                          (> comma_slash_lbrace 0)
-                                          (string= "}" (char-to-string (elt str comma_n))))
-                                (setq comma_n (1+ comma_n))
-                                (setq comma_slash_lbrace (1- comma_slash_lbrace))))
+                            (while (and (< comma_n (1- length_of_str))
+                                        (> comma_slash_lbrace 0)
+                                        (string= "}" (char-to-string (elt str comma_n))))
+                              (setq comma_n (1+ comma_n))
+                              (setq comma_slash_lbrace (1- comma_slash_lbrace)))
                           (progn ;comma_n points to the second last ch of str
                             (setq comma_slash_lbrace (1- comma_slash_lbrace))
                             (setq comma_ttmp_str (char-to-string (elt str (1+ comma_n))))
@@ -293,7 +291,7 @@ CONTENTS TITLE/
                                     (string= "," comma_ttmp_str))
                                 (error "Wrong format of argument"))
                             (when (string= "}" comma_ttmp_str)
-                                (setq comma_slash_lbrace (1- comma_slash_lbrace)))))
+                              (setq comma_slash_lbrace (1- comma_slash_lbrace)))))
                         (if (= 0 comma_slash_lbrace) ;no siblings
                             (progn
                               (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
@@ -305,17 +303,17 @@ CONTENTS TITLE/
                             (setcar
                              (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
                              t))))
-                    (progn
-                      (when (string= "," (char-to-string (elt str comma_n)))
-                        (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
-                        (setcar
-                         (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
-                         t))
-                      (when (string= "}" (char-to-string (elt str comma_n)))
-                        (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
-                        (setcar
-                         (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
-                         nil))))))
+                    (cond
+                     ((string= "," (char-to-string (elt str comma_n)))
+                      (setq comma_tmp_str (concat (nth 0 JOINT) comma_tmp_str))
+                      (setcar
+                       (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                       t))
+                     ((string= "}" (char-to-string (elt str comma_n)))
+                      (setq comma_tmp_str (concat (nth 1 JOINT) comma_tmp_str))
+                      (setcar
+                       (nthcdr (- (1- (length sib_flag_list)) level) sib_flag_list)
+                       nil))))))
               (if (or (not level) (= level 0))
                   (setq contents_tree (concat contents_tree comma_tmp_str "\n"))
                 (progn
