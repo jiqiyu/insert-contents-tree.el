@@ -44,7 +44,7 @@
 ;; ├─2
 ;; │  └─2.1
 ;; └─3
-;;     └─3.1
+;;    └─3.1
 
 ;; after require the func, you can check out following examples, use C-x C-e on them
 
@@ -103,7 +103,7 @@ CONTENTS TITLE/
 ├─2
 │  └─2.1
 └─3
-    └─3.1
+   └─3.1
 "
   (interactive "sType a string to generate your tree: ")
   (let ((contents_tree "\n\n")
