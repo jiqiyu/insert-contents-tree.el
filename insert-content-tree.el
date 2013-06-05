@@ -127,7 +127,7 @@ CONTENTS TITLE/
         (comma_ttmp_str "")
         (sib_flag_list nil)
         (JOINT '("├─" "└─")) ;or (JOINT '("|-- " "`-- "))
-        (VB2S "│  ") ;or (VB2S "|   ") ;vertical bar and 2 spaces
+        (VBSP "│  ") ;or (VBSP "|   ") ;vertical bar and spaces
         (4SPACES "    "))
     (if (string-match "\\(^.+?\\)/" str)
         (progn
@@ -178,7 +178,7 @@ CONTENTS TITLE/
             (progn ;level>0
               (dolist (flag (last sib_flag_list level))
                 (if flag
-                    (setq slash_tmp_str (concat VB2S slash_tmp_str))
+                    (setq slash_tmp_str (concat VBSP slash_tmp_str))
                   (setq slash_tmp_str (concat 4SPACES slash_tmp_str))))
               (setq contents_tree (concat contents_tree slash_tmp_str "\n"))))
           (or (string= "do_nothing" slash_tmp_flag)
@@ -204,7 +204,7 @@ CONTENTS TITLE/
                 (progn
                   (dolist (flag (last sib_flag_list level))
                     (if flag
-                        (setq lbrace_tmp_str (concat VB2S lbrace_tmp_str))
+                        (setq lbrace_tmp_str (concat VBSP lbrace_tmp_str))
                       (setq lbrace_tmp_str (concat 4SPACES lbrace_tmp_str))))
                   (setq contents_tree (concat contents_tree lbrace_tmp_str "\n"))))
               (push t sib_flag_list))
@@ -321,7 +321,7 @@ CONTENTS TITLE/
                 (progn
                   (dolist (flag (last sib_flag_list level))
                     (if flag
-                        (setq comma_tmp_str (concat VB2S comma_tmp_str))
+                        (setq comma_tmp_str (concat VBSP comma_tmp_str))
                       (setq comma_tmp_str (concat 4SPACES comma_tmp_str))))
                   (setq contents_tree (concat contents_tree comma_tmp_str "\n")))))
           (error "Something goes wrong"))
