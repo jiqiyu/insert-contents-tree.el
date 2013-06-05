@@ -128,7 +128,7 @@ CONTENTS TITLE/
         (comma_ttmp_str "")
         (sib_flag_list nil)
         (JOINT '("|-- " "`-- ")) ;or (JOINT '("├─" "└─"))
-        (VBSP "|   ") ;or (VBSP "│  ") ;vertical bar and 2 spaces
+        (VBSP "|   ") ;or (VBSP "│  ") ;vertical bar and spaces
         (4SPACES "    "))
     (if (string-match "\\(^.+?\\)/" str)
         (progn
