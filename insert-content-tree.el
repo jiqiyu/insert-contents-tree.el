@@ -32,7 +32,7 @@
 ;; CONTENTS TITLE/{1/1.1/{1.1.1/{1.1.1.1,1.1.1.2,1.1.1.3},1.1.2,1.1.3},2/2.1,3/3.1}
 ;; would insert following contents tree into current buffer(at the cursor point):
 
-;; CONTENTS TITLE/
+;; CONTENTS TITLE
 ;; |-- 1
 ;; |   `-- 1.1
 ;; |       |-- 1.1.1
@@ -91,7 +91,7 @@ CONTENTS TITLE/{1/1.1/{1.1.1/{1.1.1.1,1.1.1.2,1.1.1.3},1.1.2,1.1.3},2/2.1,3/3.1}
 would insert following contents tree into current buffer (starts from
 a new line after the cursor point):
 
-CONTENTS TITLE/
+CONTENTS TITLE
 |-- 1
 |   `-- 1.1
 |       |-- 1.1.1
@@ -133,7 +133,7 @@ CONTENTS TITLE/
     (if (string-match "\\(^.+?\\)/" str)
         (progn
           ;CONTENTS TITLE
-          (setq contents_tree (concat contents_tree (match-string 0 str) "\n"))
+          (setq contents_tree (concat contents_tree (match-string 1 str) "\n"))
           (setq str (replace-match "/" nil nil str))
           (setq length_of_str (length str)))
       (error "Can't match the title"))
