@@ -1,7 +1,7 @@
 ;;; insert-contents-tree.el --- Generate a contents tree according to given str
 
 ;; Copyright (C) 2013 Fog
-     
+
 ;; Author: Fog
 ;; Created: 4 Jun 2013
 ;; Keywords: contents tree
@@ -132,21 +132,21 @@ CONTENTS TITLE
         (4SPACES "    "))
     (if (string-match "\\(^.+?\\)/" str)
         (progn
-          ;CONTENTS TITLE
+          ;; CONTENTS TITLE
           (setq contents_tree (concat contents_tree (match-string 1 str) "\n"))
           (setq str (replace-match "/" nil nil str))
           (setq length_of_str (length str)))
       (error "Can't match the title"))
-    (when (or (string-match "\\(/\\{2,\\}\\|{\\{2,\\}\\|,\\{2,\\}\\)" str)
-            (string-match "\\({/\\|{}\\|{,\\|,/\\|,}\\|,{\\|/,\\|/}\\|}/\\|}{\\)" str)
-            (string-match "[,/{]$" str))
-        (error "Wrong format of argument"))
+    (when (or (string-match-p "\\(/\\{2,\\}\\|{\\{2,\\}\\|,\\{2,\\}\\)" str)
+              (string-match-p "\\({/\\|{}\\|{,\\|,/\\|,}\\|,{\\|/,\\|/}\\|}/\\|}{\\)" str)
+              (string-match-p "[,/{]$" str))
+      (error "Wrong format of argument"))
     (while (< n length_of_str)
       (when (< braces 0)
         (error "Wrong format of argument, unpaired braces, maybe too many }s"))
       (when (and (>= braces 0)
-               (string= "{" (char-to-string (elt str n))))
-          (setq braces (1+ braces)))
+                 (string= "{" (char-to-string (elt str n))))
+        (setq braces (1+ braces)))
       (when (string= "}" (char-to-string (elt str n))) (setq braces (1- braces)))
       (setq n (1+ n)))
     (when (> braces 0)
@@ -219,12 +219,12 @@ CONTENTS TITLE
         )
       (when (string= ch "}")
         (when first_siblings_lbrace_list
-            (setq rbrace_tmp_list (pop first_siblings_lbrace_list))) ;pop
+          (setq rbrace_tmp_list (pop first_siblings_lbrace_list))) ;pop
         (or first_siblings_lbrace_list (setq level -1))
         (setq rbrace_n (1+ n))
         (when (and (/= rbrace_n length_of_str)
-                 (< level 0))
-            (error "Wrong format of argument"))
+                   (< level 0))
+          (error "Wrong format of argument"))
         (and (< rbrace_n length_of_str)
              (or (string= "," (char-to-string (elt str rbrace_n)))
                  (string= "}" (char-to-string (elt str rbrace_n)))
@@ -247,7 +247,7 @@ CONTENTS TITLE
         (if (string< "" comma_tmp_str)
             (progn ;find 1st sibling's level and write to contents_tree
               (when first_siblings_lbrace_list
-                  (setq level (car (cdr (car first_siblings_lbrace_list)))))
+                (setq level (car (cdr (car first_siblings_lbrace_list)))))
               (or level
                   (error "Something wrong with the variable `level'"))
               (if (string= "," (char-to-string (elt str comma_n)))
@@ -275,15 +275,15 @@ CONTENTS TITLE
                                     (not (string= "}" (char-to-string (elt str comma_n)))))
                           (setq comma_n (1+ comma_n))
                           (when (string= "{" (char-to-string (elt str comma_n)))
-                              (setq comma_slash_lbrace (1+ comma_slash_lbrace))))
+                            (setq comma_slash_lbrace (1+ comma_slash_lbrace))))
                         (when (= comma_n length_of_str) ;out of range
-                            (error "Wrong format of argument, braces do not match"))
-                        ;if comma_n points to the last character of string
+                          (error "Wrong format of argument, braces do not match"))
+                        ;; if comma_n points to the last character of string
                         (when (= (1+ comma_n) length_of_str) 
-                            (error "Wrong format of argument, braces do not match"))
-                        ;if it's at least the third last ch
+                          (error "Wrong format of argument, braces do not match"))
+                        ;; if it's at least the third last ch
                         (if (< (1+ comma_n) (- length_of_str 2))
-                            ;make sure comma_n won't go beyond the second last ch of str
+                            ;; make sure comma_n won't go beyond the second last ch of str
                             (while (and (< comma_n (1- length_of_str))
                                         (> comma_slash_lbrace 0)
                                         (string= "}" (char-to-string (elt str comma_n))))
