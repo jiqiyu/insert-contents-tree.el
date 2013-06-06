@@ -17,7 +17,7 @@ would insert following contents tree into current buffer(at the cursor point):
 
 ```
 
-CONTENTS TITLE/
+CONTENTS TITLE
 |-- 1
 |   `-- 1.1
 |       |-- 1.1.1
@@ -38,7 +38,7 @@ in the .el file, the results would look like this:
 
 ```
 
-CONTENTS TITLE/
+CONTENTS TITLE
 ├─1
 │  └─1.1
 │      ├─1.1.1
